@@ -12,7 +12,6 @@ pipeline {
     }
 
     stages {
-
         stage('git checkout') {
             steps {
                 git branch: 'master', url: 'https://github.com/PrajwalPatel/Ekart.git'
@@ -44,13 +43,14 @@ pipeline {
 
         stage('OWASP Dependency Check') {
             steps {
-                withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                  withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
                     dependencyCheck additionalArguments: "--nvdApiKey=$NVD_API_KEY",
                     odcInstallation: 'DC'
                     dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-                }
+                  }
             }
         }
+
 
         stage('Build') {
             steps {
@@ -60,52 +60,44 @@ pipeline {
 
         stage('deploy to Nexus') {
             steps {
-                withMaven(
-                    globalMavenSettingsConfig: 'global-maven',
-                    jdk: 'jdk-17',
-                    maven: 'maven3',
-                    mavenSettingsConfig: '',
-                    traceability: true
-                ) {
+                withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk-17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
                     sh "mvn deploy -DskipTests=true"
                 }
             }
         }
+        
 
         stage('build and Tag docker image') {
             steps {
                 script {
-                    sh "docker build -t phpatelpaik/ekart:latest -f docker/Dockerfile ."
-                }
-            }
-        }
-
-        stage('Push image to Hub') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                        sh 'docker login -u phpatelpaik -p ${dockerhubpwd}'
+                        sh "docker build -t phpatelpaik/ekart:latest -f docker/Dockerfile ."
                     }
-                    sh 'docker push phpatelpaik/ekart:latest'
-                }
             }
         }
 
-        stage('EKS and Kubectl configuration') {
-            steps {
-                script {
+        stage('Push image to Hub'){
+            steps{
+                script{
+                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                   sh 'docker login -u phpatelpaik -p ${dockerhubpwd}' }
+                   sh 'docker push phpatelpaik/ekart:latest'
+                }
+            }
+        }
+        stage('EKS and Kubectl configuration'){
+            steps{
+                script{
                     sh 'aws eks update-kubeconfig --region ap-south-1 --name project-cluster'
                 }
             }
         }
-
-        stage('Deploy to k8s') {
-            steps {
-                script {
+        stage('Deploy to k8s'){
+            steps{
+                script{
                     sh 'kubectl apply -f deploymentservice.yml'
                 }
             }
         }
-
     }
+
 }
