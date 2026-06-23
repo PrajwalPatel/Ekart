@@ -32,7 +32,7 @@ pipeline {
 
         stage('SonarQube analysis') {
             steps {// -Dsonar.host.url=http://invalid-host:9000 \
-    }
+                }
                 withSonarQubeEnv('sonar') {
                     sh "${env.SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.project=EKART \  
@@ -40,7 +40,7 @@ pipeline {
                         -Dsonar.java.binaries=target/classes"
                 }
             }
-        }
+         
          stage('OWASP Dependency Check') {
             steps {
                 withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
@@ -112,4 +112,4 @@ pipeline {
             }
         }
     }
-
+}
