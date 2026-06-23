@@ -106,6 +106,7 @@ pipeline {
             steps{
                 script{
                     sh 'kubectl apply -f deploymentservice.yml'
+                    sh 'kubectl rollout restart deployment/ekart-deployment'
                 }
             }
         }
