@@ -40,22 +40,28 @@ pipeline {
                 }
             }
         }
-        stage('OWASP Dependency Check') {
+         stage('OWASP Dependency Check') {
             steps {
                 withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
-                dependencyCheck(
-                odcInstallation: 'DC',
-                additionalArguments: "--scan . --format XML --out ${WORKSPACE} --nvdApiKey=${NVD_API_KEY}"
-            )
+                    dependencyCheck(
+                        odcInstallation: 'DC',
+                        additionalArguments: '''
+                            --scan .
+                            --format XML
+                            --out ''' + WORKSPACE + '''
+                            --nvdApiKey=''' + NVD_API_KEY + '''
+                            --nvdApiDelay 6000
+                            --nvdMaxRetryCount 10
+                            --data ''' + "${WORKSPACE}/dependency-check-data"
+                    )
+                }
+            }
+            post {
+                always {
+                    dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                }
+            }
         }
-    }
-        post {
-            always {
-              dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-        }
-    }
-}
-
 
         stage('Build') {
             steps {
