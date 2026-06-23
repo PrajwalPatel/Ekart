@@ -102,14 +102,14 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to k8s'){
-            steps{
-                withAWS(credentials: 'aws-eks-creds', region: 'ap-south-1') {
+        stage('Deploy to k8s') {
+    steps {
+        withAWS(credentials: 'aws-eks-creds', region: 'ap-south-1') {
             sh 'aws eks update-kubeconfig --region ap-south-1 --name project-cluster --kubeconfig /tmp/kubeconfig'
             sh 'KUBECONFIG=/tmp/kubeconfig kubectl apply -f deploymentservice.yml'
             sh 'KUBECONFIG=/tmp/kubeconfig kubectl rollout restart deployment/ekart-deployment'
-            }
         }
     }
-
+}
+    }
 }
