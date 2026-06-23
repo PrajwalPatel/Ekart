@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        NVD_API_KEY = credentials('nvd-api-key')  // Jenkins secret text credential
+        NVD_API_KEY = credentials('nvd-api-key')  // Jenkins secret text credential 
     }
 
     tools {
@@ -31,11 +31,11 @@ pipeline {
         }
 
         stage('SonarQube analysis') {
-            steps {
+            steps {// -Dsonar.host.url=http://invalid-host:9000 \
+    }
                 withSonarQubeEnv('sonar') {
                     sh "${env.SCANNER_HOME}/bin/sonar-scanner \
-                        // -Dsonar.host.url=http://invalid-host:9000 \ 
-                        -Dsonar.project=EKART \
+                        -Dsonar.project=EKART \  
                         -Dsonar.projectName=EKART \
                         -Dsonar.java.binaries=target/classes"
                 }
@@ -112,4 +112,4 @@ pipeline {
             }
         }
     }
-}
+
