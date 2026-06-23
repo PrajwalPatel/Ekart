@@ -30,16 +30,16 @@ pipeline {
             }
         }
 
-        stage('SonarQube analysis') {
-            steps {// -Dsonar.host.url=http://invalid-host:9000 \
-                }
+        stage('SonarQube analysis') { // -Dsonar.host.url=http://invalid-host:9000 \
+            steps {
                 withSonarQubeEnv('sonar') {
                     sh "${env.SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.project=EKART \  
+                        -Dsonar.projectKey=EKART \
                         -Dsonar.projectName=EKART \
                         -Dsonar.java.binaries=target/classes"
                 }
             }
+        }
          
          stage('OWASP Dependency Check') {
             steps {
