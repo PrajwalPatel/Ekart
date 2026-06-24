@@ -37,6 +37,7 @@ pipeline {
                         -Dsonar.projectKey=EKART \
                         -Dsonar.projectName=EKART \
                         -Dsonar.java.binaries=target/classes"
+                        -Dsonar.host.url=http://invalid-host:9000 \
                 }
             }
         }
